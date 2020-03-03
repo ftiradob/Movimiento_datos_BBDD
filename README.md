@@ -78,6 +78,29 @@ oracle@OracleJessie:~/scott$ ls
 copiascott.dmp	scottesquema.log
 ~~~
 
+Para programar la operación dentro de 5 minutos vamos a realizar una tarea de cron. Primero realizamos el siguiente script:
+
+~~~
+oracle@OracleJessie:~$ sudo nano script5minutos.sh
+#!/bin/bash
+expdp system/RAUL schemas=SCOTT directory=delegado dumpfile=copiascott.dmp logfile=scottesquema.log
+~~~
+
+Le cambiamos los permisos:
+
+~~~
+oracle@OracleJessie:~$ sudo chmod 744 script5minutos.sh
+~~~
+
+Creamos la tarea de cron:
+
+~~~
+oracle@OracleJessie:~$ sudo crontab -e
+*/5 * * * * /home/oracle/script5minutos.sh
+~~~
+
+Reiniciamos el servicio y ya tendríamos nuestro cron funcionando.
+
 ### 2. Importa el fichero obtenido anteriormente usando Enterprise Manager pero en un usuario distinto de la misma base de datos.
 
 ### 3. Realiza una exportación de la estructura de todas las tablas de la base de datos usando el comando expdp de Oracle Data Pump probando todas las posibles opciones que ofrece dicho comando y documentándolas adecuadamente.
