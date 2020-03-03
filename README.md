@@ -43,7 +43,29 @@ SQL> GRANT READ, WRITE ON DIRECTORY delegado TO system;
 Concesión terminada correctamente.
 ~~~
 
-Realizamos la exportación:
+Antes de realizar la exportación vamos a hacer una estimación:
+
+~~~
+oracle@OracleJessie:~$ expdp system/RAUL schemas=SCOTT ESTIMATE_ONLY=YES directory=delegado
+
+Export: Release 12.1.0.2.0 - Production on Mar Mar 3 20:53:29 2020
+
+Copyright (c) 1982, 2014, Oracle and/or its affiliates.  All rights reserved.
+
+Conectado a: Oracle Database 12c Enterprise Edition Release 12.1.0.2.0 - 64bit Production
+With the Partitioning, OLAP, Advanced Analytics and Real Application Testing options
+
+Advertencia: las operaciones de Oracle Data Pump no se necesitan normalmente cuando se conecta a la raíz o al elemento inicial de una base de datos del contenedor.
+
+Iniciando "SYSTEM"."SYS_EXPORT_SCHEMA_01":  system/******** schemas=SCOTT ESTIMATE_ONLY=YES directory=delegado 
+Estimación en curso mediante el método BLOCKS...
+Estimación total mediante el método BLOCKS: 0 KB
+El trabajo "SYSTEM"."SYS_EXPORT_SCHEMA_01" ha terminado correctamente en Mar Mar 3 20:53:33 2020 elapsed 0 00:00:03
+~~~
+
+Es normal que nos indique 0 KB ya que el esquema SCOTT solamente tiene 2 tablas y apenas ocupa espacio.
+
+Realizamos la exportación del esquema SCOTT, indicando que además cree un archivo de log:
 
 ~~~
 oracle@OracleJessie:~$ expdp system/RAUL schemas=SCOTT directory=delegado dumpfile=copiascott.dmp logfile=scottesquema.log
@@ -59,6 +81,83 @@ copiascott.dmp	scottesquema.log
 ### 2. Importa el fichero obtenido anteriormente usando Enterprise Manager pero en un usuario distinto de la misma base de datos.
 
 ### 3. Realiza una exportación de la estructura de todas las tablas de la base de datos usando el comando expdp de Oracle Data Pump probando todas las posibles opciones que ofrece dicho comando y documentándolas adecuadamente.
+
+Lo primero que tenemos que hacer es crear un directorio en la base de datos vinculándolo con un directorio de la máquina:
+
+~~~
+SQL> CREATE DIRECTORY datosdelegado as '/home/oracle/datosdelegado';
+
+Directorio creado.
+~~~
+
+Ahora tenemos que darle los permisos necesarios al usuario 'system' para realizar esta tarea:
+
+~~~
+SQL> GRANT EXP_FULL_DATABASE to system;
+
+Concesión terminada correctamente.
+
+SQL> GRANT IMP_FULL_DATABASE to system;
+
+Concesión terminada correctamente.
+
+SQL> GRANT READ, WRITE ON DIRECTORY datosdelegado TO system;
+
+Concesión terminada correctamente.
+~~~
+
+Ahora vamos a realizar la exportación:
+
+~~~
+oracle@OracleJessie:~$ expdp system/RAUL directory=datosdelegado dumpfile=datosdelegado.dmp logfile=logdelegado.log
+
+Export: Release 12.1.0.2.0 - Production on Mar Mar 3 20:44:42 2020
+
+Copyright (c) 1982, 2014, Oracle and/or its affiliates.  All rights reserved.
+
+Conectado a: Oracle Database 12c Enterprise Edition Release 12.1.0.2.0 - 64bit Production
+With the Partitioning, OLAP, Advanced Analytics and Real Application Testing options
+
+Advertencia: las operaciones de Oracle Data Pump no se necesitan normalmente cuando se conecta a la raíz o al elemento inicial de una base de datos del contenedor.
+
+Iniciando "SYSTEM"."SYS_EXPORT_SCHEMA_01":  system/******** directory=datosdelegado dumpfile=datosdelegado.dmp logfile=logdelegado.log 
+Estimación en curso mediante el método BLOCKS...
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/TABLE_DATA
+Estimación total mediante el método BLOCKS: 0 KB
+Procesando el tipo de objeto SCHEMA_EXPORT/DEFAULT_ROLE
+Procesando el tipo de objeto SCHEMA_EXPORT/PRE_SCHEMA/PROCACT_SCHEMA
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/TABLE
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/COMMENT
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/INDEX/INDEX
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/CONSTRAINT/CONSTRAINT
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/INDEX/STATISTICS/INDEX_STATISTICS
+Procesando el tipo de objeto SCHEMA_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+Procesando el tipo de objeto SCHEMA_EXPORT/STATISTICS/MARKER
+Procesando el tipo de objeto SCHEMA_EXPORT/POST_SCHEMA/PROCACT_SCHEMA
+La tabla maestra "SYSTEM"."SYS_EXPORT_SCHEMA_01" se ha cargado/descargado correctamente
+******************************************************************************
+El juego de archivos de volcado para SYSTEM.SYS_EXPORT_SCHEMA_01 es:
+  /home/oracle/datosdelegado/datosdelegado.dmp
+El trabajo "SYSTEM"."SYS_EXPORT_SCHEMA_01" ha terminado correctamente en Mar Mar 3 20:45:40 2020 elapsed 0 00:00:55
+~~~
+
+Las opciones más importantes que ofrece Oracle Data Pump son:
+
+- COMPRESSION => Especifica si la exportación va a ser comprimida.
+- CONTENT => Filtrar lo que exportas.
+- DIRECTORY => Especificamos la localización en la que la exportación puede excribir.
+- DUMPFILE => Especifica el nombre del fichero exportado.
+- ENCRYPTION_PASSWORD => Especifica una clave para la encriptación.
+- ESTIMATE => Usado para realizar una estimación en la exportación.
+- ESTIMATE_ONLY => Solamente realiza una estimación.
+- EXCLUDE => Excluye el objeto que le indiquemos.
+- FILESIZE => Especificamos el tamaño máximo del archivo exportado.
+- FULL => Especifica que exporte todo: estructura de tablas, datos y metadatos.
+- LOGFILE => Especifica el nombre del archivo de log.
+- NOLOGFILE => Especifica que no cree fichero de log.
+- SCHEMAS => Especifica un esquema concreto.
+- TABLES => Especifica una tabla concreta.
+
 
 ### 4. Intenta realizar operaciones similares de importación y exportación con las herramientas proporcionadas con MySQL desde línea de comandos, documentando el proceso.
 
