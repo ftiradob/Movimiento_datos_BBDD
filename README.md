@@ -129,19 +129,24 @@ Creamos también una colección de ejemplo y listamos:
 { "_id" : ObjectId("5e5e9fe2967697ce195bea13"), "usuario_id" : "abc123", "nombre" : "Fernando", "edad" : 24, "categoria" : "A" }
 ~~~
 
-Ahora vamos a realizar una exportación de este ejemplo y vemos el contenido:
+Ahora vamos a realizar una exportación de este ejemplo. Usando la herramienta 'mongoexport' indicándole la colección que queremos exportar (--collection), la base de datos en la que esta (--db) y el nombre del fichero json que se va a generar (--out):
 
 ~~~
 vagrant@mongo:~$ mongoexport --collection=delegado --db=delegado --out=delegado.json
 2020-03-03T18:23:30.863+0000	connected to: mongodb://localhost/
 2020-03-03T18:23:30.871+0000	exported 1 record
+~~~
+
+Vemos el contenido:
+
+~~~
 vagrant@mongo:~$ ls
 delegado.json
 vagrant@mongo:~$ cat delegado.json 
 {"_id":{"$oid":"5e5e9fe2967697ce195bea13"},"usuario_id":"abc123","nombre":"Fernando","edad":24.0,"categoria":"A"}
 ~~~
 
-Finalmente vamos a realizar una importación usando el fichero json creado al exportar:
+Finalmente vamos a realizar una importación usando el fichero json creado al exportar. Usando la herramienta 'mongoimport' indicándole la base de datos donde queremos importarla (--db), el nombre que tendrá la colección (--collection) y el nombre del fichero json que exportamos anteriormente (--file):
 
 ~~~
 vagrant@mongo:~$ mongoimport --db=espias --collection=agentes --file=delegado.json
