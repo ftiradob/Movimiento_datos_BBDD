@@ -13,20 +13,23 @@ Realiza ahora la operación con Oracle Data Pump.
 
 - ORACLE DATA PUMP
 
-1.
-
 Creamos un directorio en la máquina:
 
+~~~
 oracle@OracleJessie:~$ mkdir scott
+~~~
 
 Creamos un directorio dentro de la base de datos:
 
+~~~
 SQL> CREATE DIRECTORY delegado as '/home/oracle/scott';
 
 Directorio creado.
+~~~
 
 Damos permiso a system:
 
+~~~
 SQL> GRANT EXP_FULL_DATABASE TO system;
 
 Concesión terminada correctamente.
@@ -38,15 +41,20 @@ Concesión terminada correctamente.
 SQL> GRANT READ, WRITE ON DIRECTORY delegado TO system;
 
 Concesión terminada correctamente.
+~~~
 
 Realizamos la exportación:
 
+~~~
 oracle@OracleJessie:~$ expdp system/RAUL schemas=SCOTT directory=delegado dumpfile=copiascott.dmp logfile=scottesquema.log
+~~~
 
 Listamos el directorio y vemos ambos ficheros:
 
+~~~
 oracle@OracleJessie:~/scott$ ls
 copiascott.dmp	scottesquema.log
+~~~
 
 ### 2. Importa el fichero obtenido anteriormente usando Enterprise Manager pero en un usuario distinto de la misma base de datos.
 
